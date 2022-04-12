@@ -2,18 +2,35 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.transform import Rotation
 from helicalc import helicalc_dir
+from .geometry import read_solenoid_geom_combined
 
 # Loading dataframes with geometry information
-def load_all_geoms(return_dict=True):
+def load_all_geoms(version=14, return_dict=True):
     # files
     geom_dir = helicalc_dir+'dev/params/'
-    coils_file = geom_dir + 'Mu2e_Coils_Conductors.pkl'
-    interlayer_file = geom_dir+'Mu2e_V13_coil_interlayer.txt'
-    straight_file = geom_dir + 'Mu2e_Straight_Bars_V13.csv'
-    arc_file = geom_dir + 'Mu2e_Arc_Bars_V13.csv'
-    arc_transfer_file = geom_dir + 'Mu2e_Arc_Transfer_Bars_V13.csv'
+    # old file
+    #coils_file = geom_dir + f'Mu2e_Coils_Conductors_V{version}.pkl'
+    interlayer_file = geom_dir+f'Mu2e_V{version}_coil_interlayer.txt'
+    straight_file = geom_dir + f'Mu2e_Straight_Bars_V{version}.csv'
+    arc_file = geom_dir + f'Mu2e_Arc_Bars_V{version}.csv'
+    arc_transfer_file = geom_dir + f'Mu2e_Arc_Transfer_Bars_V{version}.csv'
     # load dataframes
-    df_coils = pd.read_pickle(coils_file)
+    #df_coils = pd.read_pickle(coils_file)
+    # read coils and add which solenoid system each coil is in
+    df_coils = read_solenoid_geom_combined(helicalc_dir+'dev/params/',
+                                           f'Mu2e_V{version}')
+    # move this? or don't hard code?
+    # FIXME!
+    df_coils['Solenoid'] = 'TS'
+    df_coils.loc[0:2, 'Solenoid'] = 'PS'
+    df_coils.loc[55:, 'Solenoid'] = 'DS'
+    df_coils['Solenoid_full'] = df_coils['Solenoid']
+    df_coils.loc[3:5, 'Solenoid_full'] = 'TS1'
+    df_coils.loc[6:23, 'Solenoid_full'] = 'TS2'
+    df_coils.loc[24:31, 'Solenoid_full'] = 'TS3'
+    df_coils.loc[32:49, 'Solenoid_full'] = 'TS4'
+    df_coils.loc[50:54, 'Solenoid_full'] = 'TS5'
+    # coil interlayer connection
     df_interlayer = pd.read_csv(interlayer_file)
     df_str = pd.read_csv(straight_file)
     df_arc = pd.read_csv(arc_file)

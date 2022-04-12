@@ -19,7 +19,8 @@ save_name = output_dir+'Mau14.DS1_region_plane.standard-helicalc.coil_56_full.pk
 
 # load coil geometry
 paramdir = helicalc_dir + 'dev/params/'
-paramname = 'Mu2e_V13'
+# paramname = 'Mu2e_V13'
+paramname = 'Mu2e_V14' # correct
 
 geom_df = read_solenoid_geom_combined(paramdir,paramname).iloc[55:].copy()
 df_DS1 = geom_df.query('Coil_Num == 56').copy().iloc[0]
@@ -30,7 +31,7 @@ df_chunks = pd.read_csv(chunk_file)
 N_chunk_coil = df_chunks.query(f'Nt_Ri == {df_DS1.Nt_Ri}').iloc[0].N_field_points
 
 # load interlayer geometry
-df_dict = load_all_geoms(return_dict=True)
+df_dict = load_all_geoms(version=14, return_dict=True)
 df_DS1_IL = df_dict['interlayers'].query('`cond N` == 56').copy().iloc[0]
 # kludge for better column naming
 df_DS1_IL['cond N'] = f'{int(df_DS1_IL["cond N"])}_il'

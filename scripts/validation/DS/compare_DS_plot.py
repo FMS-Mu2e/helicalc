@@ -14,17 +14,16 @@ from mu2e.mu2eplots import mu2e_plot3d
 
 # set up directories, load data
 # standard
-plotdir = helicalc_data+'plots/helicalc/validation/DS1/'
+# plotdir = helicalc_data+'plots/helicalc/validation/DS/'
 # radius optimize
-# plotdir = helicalc_data+'plots/helicalc/validation/DS1/optimize/'
+plotdir = helicalc_data+'plots/helicalc/validation/DS/optimize/'
 
 # standard
-data_file = helicalc_data+'Bmaps/helicalc_validation/Mau14.DS1_region_plane.standard-helicalc.coil_56_full.pkl'
+# data_file = helicalc_data+'Bmaps/helicalc_validation/Mau14.DS_region_plane.standard-helicalc.coil_56-66_full.pkl'
 # radius optimize
 deltaR=-2.313e-3
 deltaR_mm = deltaR * 1e3
-#data_file = helicalc_data+f'Bmaps/helicalc_validation/optimize/Mau14.DS1_region_plane_sparse.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_56_full.pkl'
-# data_file = helicalc_data+f'Bmaps/helicalc_validation/optimize/Mau14.DS1_region_plane.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_56_full.pkl'
+data_file = helicalc_data+f'Bmaps/helicalc_validation/optimize/Mau14.DS_region_plane.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_56-66_full.pkl'
 
 df = pd.read_pickle(data_file)
 
@@ -40,22 +39,22 @@ for y in [0.0]:
         # fig = mu2e_plot3d(df, 'X', 'Z', f'B{i}', f'-0.9<=X<=0.9 and Y=={y} and 3.348<=Z<=4.149', units='m', mode='mpl', fig=fig, ax=ax2)
         fig = mu2e_plot3d(df, 'X', 'Z', f'B{i}_helicalc', f'Y=={y}', units='m', mode='mpl', fig=fig, ax=ax1)
         fig = mu2e_plot3d(df, 'X', 'Z', f'B{i}', f'Y=={y}', units='m', mode='mpl', fig=fig, ax=ax2)
-        fig.suptitle(f'B{i} vs X and Z for DS-1\n-0.9<=X<=0.9, Y=={y}, 3.348<=Z<=4.149')
+        fig.suptitle(f'B{i} vs X and Z for All DS Coils\n-0.9<=X<=0.9, Y=={y}, 3.071<=Z<=16.071')
         ax1.set_xlabel('R (m)')
         ax1.set_ylabel('Z (m)')
-        ax1.set_title('Helicalc\n(Helical Coil + Interlayer Connect)')
-        ax2.set_title('OPERA\n(Helical Coil + Interlayer Connect)')
-        fig.savefig(plotdir+f'DS1_B{i}_vs_X_Z_Y_{y:0.2f}_compare.pdf')
-        fig.savefig(plotdir+f'DS1_B{i}_vs_X_Z_Y_{y:0.2f}_compare.png')
+        ax1.set_title('Helicalc\n(Helical Coils + Interlayer Connect)')
+        ax2.set_title('OPERA\n(Helical Coils + Interlayer Connect)')
+        fig.savefig(plotdir+f'DS_B{i}_vs_X_Z_Y_{y:0.2f}_compare.pdf')
+        fig.savefig(plotdir+f'DS_B{i}_vs_X_Z_Y_{y:0.2f}_compare.png')
 
 # delta plots
 for y in [0.0]:
     for i in ['x', 'y', 'z']:
         fig, ax = plt.subplots()
         fig = mu2e_plot3d(df, 'X', 'Z', f'B{i}_delta', f'Y=={y}', units='m', mode='mpl', ptype='heat', fig=fig, ax=ax)
-        fig.suptitle(f'(B{i}_helicalc - B{i}_OPERA) vs X and Z for DS-1\n-0.9<=X<=0.9, Y=={y}, 3.348<=Z<=4.149')
+        fig.suptitle(f'(B{i}_helicalc - B{i}_OPERA) vs X and Z for All DS Coils\n-0.9<=X<=0.9, Y=={y}, 3.071<=Z<=16.071')
         ax.set_title(None)
         #         ax.set_xlabel('R (m)')
 #         ax.set_ylabel('Z (m)')
-        fig.savefig(plotdir+f'DS1_deltaB{i}_vs_X_Z_Y_{y:0.2f}_compare.pdf')
-        fig.savefig(plotdir+f'DS1_deltaB{i}_vs_X_Z_Y_{y:0.2f}_compare.png')
+        fig.savefig(plotdir+f'DS_deltaB{i}_vs_X_Z_Y_{y:0.2f}_compare.pdf')
+        fig.savefig(plotdir+f'DS_deltaB{i}_vs_X_Z_Y_{y:0.2f}_compare.png')

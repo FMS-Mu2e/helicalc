@@ -19,11 +19,13 @@ output_dir = helicalc_data+'Bmaps/helicalc_validation/optimize/'
 # y=0 plane
 #save_name = output_dir+'Mau14.DS1_region_plane.standard-helicalc.coil_56_full.pkl'
 #save_name = output_dir+f'Mau14.DS1_region_plane_sparse.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_56_full.pkl'
-save_name = output_dir+f'Mau14.DS8_region_plane.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_63_full.pkl'
+# save_name = output_dir+f'Mau14.DS8_region_plane.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_63_full.pkl'
+save_name = output_dir+f'Mau13.DS8_region_plane.coil_dR_{deltaR_mm:0.3f}mm-helicalc.coil_63_full.pkl'
 
 # load coil geometry
 paramdir = helicalc_dir + 'dev/params/'
-paramname = 'Mu2e_V13'
+paramname = 'Mu2e_V13' # correct
+# paramname = 'Mu2e_V14'
 
 geom_df = read_solenoid_geom_combined(paramdir,paramname).iloc[55:].copy()
 # series
