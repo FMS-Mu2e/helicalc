@@ -2,6 +2,7 @@ from sys import getsizeof
 from time import time
 import numpy as np
 import torch as tc
+from scipy.constants import mu_0
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 #import multiprocessing
@@ -13,7 +14,8 @@ from .tools import *
 
 
 class CoilIntegrator(object):
-    def __init__(self, geom_coil, dxyz, layer=1, int_func=tc.trapz, lib=tc, dev=0, interlayer_connect=True):
+    def __init__(self, geom_coil, dxyz, layer=1, int_func=tc.trapz, lib=tc, dev=0, interlayer_connect=True,
+                 j_rho_func=None):
         if layer > geom_coil.N_layers:
             raise ValueError(f'Layer "{layer}" invalid. Please select layer in the range [1, {int(geom_coil.N_layers)}]')
         # set correct device
@@ -75,7 +77,17 @@ class CoilIntegrator(object):
         self.HRHOCOSPHI = self.helicity * self.RHOCOSPHI
         self.HRHOSINPHI = self.helicity * self.RHOSINPHI
         self.ZTERM = self.z_start + self.ZETA + abs(self.PHI - self.phi_i) * geom_coil.pitch_bar + geom_coil.t_gi
-
+        # varying or constant j?
+        self.j_rho_func = j_rho_func
+        if j_rho_func is None:
+            self.j = geom_coil.j
+            self.mu_fac = geom_coil.mu_fac
+            self.mu_fac_vec = self.mu_fac
+        else:
+            self.j = j_rho_func(self.rhos)
+            self.mu_fac_1d =mu_0 * self.j / (4*np.pi)
+            self.mu_fac = self.mu_fac_1d[..., None, None] + lib.zeros_like(self.RHO)
+            self.mu_fac_vec = self.mu_fac[None,...]
         # # estimate memory
         # Note that this is basically obsolete. Either modernize or remove. FIXME!
         per_el_rh = 1.1e-5
@@ -136,9 +148,9 @@ class CoilIntegrator(object):
         result = []
         # int_func must have params (x, y, z, x0, y0, z0)
         for integrand_func in [helix_integrand_Bx, helix_integrand_By, helix_integrand_Bz]:
-            integrand_xyz = self.geom_coil.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.RHO, self.COSPHI,
-                                                                   self.SINPHI, self.helicity,
-                                                                   self.geom_coil.pitch_bar, self.geom_coil.L)
+            integrand_xyz = self.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.RHO, self.COSPHI,
+                                                         self.SINPHI, self.helicity,
+                                                         self.geom_coil.pitch_bar, self.geom_coil.L)
             result.append(trapz_3d(self.rhos, self.zetas, self.phis, integrand_xyz, self.int_func).item())
         B_vec = np.array(result)
         # rotate vector back to mu2e coordinates
@@ -165,8 +177,8 @@ class CoilIntegrator(object):
         result = []
         # int_func must have params (x, y, z, x0, y0, z0)
         for integrand_func in [helix_integrand_Bx_min, helix_integrand_By_min, helix_integrand_Bz_min]:
-            integrand_xyz = self.geom_coil.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.HRHOCOSPHI,
-                                                                   self.HRHOSINPHI, self.geom_coil.pitch_bar)
+            integrand_xyz = self.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.HRHOCOSPHI,
+                                                         self.HRHOSINPHI, self.geom_coil.pitch_bar)
             result.append(trapz_3d(self.rhos, self.zetas, self.phis, integrand_xyz, self.int_func).item())
         B_vec = np.array(result)
         # rotate vector back to mu2e coordinates
@@ -200,8 +212,8 @@ class CoilIntegrator(object):
             result = []
             # int_func must have params (x, y, z, x0, y0, z0)
             for integrand_func in [helix_integrand_Bx_min, helix_integrand_By_min, helix_integrand_Bz_min]:
-                integrand_xyz = self.geom_coil.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.HRHOCOSPHI,
-                                                                       self.HRHOSINPHI, self.geom_coil.pitch_bar)
+                integrand_xyz = self.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.HRHOCOSPHI,
+                                                             self.HRHOSINPHI, self.geom_coil.pitch_bar)
                 result.append(trapz_3d(self.rhos, self.zetas, self.phis, integrand_xyz, self.int_func))
             if self.lib is tc:
                 B_vec = tc.stack(result)
@@ -233,8 +245,8 @@ class CoilIntegrator(object):
         result = []
         # int_func must have params (x, y, z, x0, y0, z0)
         for integrand_func in [helix_integrand_Bx, helix_integrand_By, helix_integrand_Bz]:
-            integrand_xyz = self.geom_coil.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.RHO[None,...], self.COSPHI[None,...],
-                                                                  self.SINPHI[None,...], self.helicity, self.geom_coil.pitch_bar, self.geom_coil.L)
+            integrand_xyz = self.mu_fac_vec * integrand_func(RX, RY, RZ, R2_32, self.RHO[None,...], self.COSPHI[None,...],
+                                                             self.SINPHI[None,...], self.helicity, self.geom_coil.pitch_bar, self.geom_coil.L)
             result.append(trapz_3d(self.rhos, self.zetas, self.phis, integrand_xyz, self.int_func).cpu())
         B_vecs = np.array(result)
         # rotate vector back to mu2e coordinates
@@ -262,8 +274,8 @@ class CoilIntegrator(object):
         result = []
         # int_func must have params (x, y, z, x0, y0, z0)
         for integrand_func in [helix_integrand_Bx_min, helix_integrand_By_min, helix_integrand_Bz_min]:
-            integrand_xyz = self.geom_coil.mu_fac * integrand_func(RX, RY, RZ, R2_32, self.HRHOCOSPHI[None,...],
-                                                                   self.HRHOSINPHI[None,...], self.geom_coil.pitch_bar)
+            integrand_xyz = self.mu_fac_vec * integrand_func(RX, RY, RZ, R2_32, self.HRHOCOSPHI[None,...],
+                                                             self.HRHOSINPHI[None,...], self.geom_coil.pitch_bar)
             result.append(trapz_3d(self.rhos, self.zetas, self.phis, integrand_xyz, self.int_func).cpu())
         if self.lib is tc:
             B_vecs = tc.stack(result).cpu()
