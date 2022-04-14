@@ -38,16 +38,20 @@ def rz(zeta, phi, phi0, pitch_bar, t_gi, z_start, z):
 
 def helix_integrand_Bx(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
     #return (rho * COSPHI * RZ - hel * pitch_bar * RY) / R2_32 # for +helicity
-    return (hel * rho * COSPHI * RZ - pitch_bar * RY) / R2_32
+    ###return (hel * rho * COSPHI * RZ - pitch_bar * RY) / R2_32 # correct
+    # test rho in h/2pi term
+    return rho * (hel * COSPHI * RZ - pitch_bar * RY) / R2_32
 def helix_integrand_By(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
     #return (hel * rho * SINPHI * RZ + hel * pitch_bar * RX) / R2_32
     #return hel * (rho * SINPHI * RZ + pitch_bar * RX) / R2_32 # for +helicity
-    return (hel * rho * SINPHI * RZ + pitch_bar * RX) / R2_32
+    # return (hel * rho * SINPHI * RZ + pitch_bar * RX) / R2_32 # correct
+    # test rho in h/2pi term
+    return rho * (hel * SINPHI * RZ + pitch_bar * RX) / R2_32
 
 def helix_integrand_Bz(RX, RY, RZ, R2_32, rho, COSPHI, SINPHI, hel, pitch_bar, L):
     #return (-hel * rho * SINPHI * RY - rho * COSPHI * RX) / R2_32
     #return -rho * (hel * SINPHI * RY + COSPHI * RX) / R2_32 # for +helicity
-    return - hel * rho * (SINPHI * RY + COSPHI * RX) / R2_32
+    return - hel * rho * (SINPHI * RY + COSPHI * RX) / R2_32 # correct
 
 # minimal terms
 def rx_min(RHOCOSPHI, x):

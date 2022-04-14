@@ -15,7 +15,10 @@ sys.path.append(os.path.join(helicalc_dir, 'scripts/geometry/'))
 from make_interlayer_geoms import prep_df_il, find_euler2_interlayer
 
 # deltaR hard code
-deltaR=-2.313e-3
+deltaR=-2.313e-3 # using best result from DS-8
+# deltaR=-3.472e-3 # test 2, scaling based on T parameter of conductor
+# deltaR=-2.5e-3 # test 3, small bump to smaller R from DS-8
+# deltaR=-2.1e-3 # test 4, small bump to larger R from DS-8
 deltaR_mm = deltaR * 1e3
 
 # output info
@@ -38,6 +41,8 @@ geom_df = read_solenoid_geom_combined(paramdir,paramname).iloc[55:].copy()
 # df_DS1 = geom_df.query('Coil_Num == 56').copy().iloc[0]
 # dataframe
 df_DS1 = geom_df.query('Coil_Num == 56').copy()#.iloc[0]
+# TEST! Round Z location
+## df_DS1.z = round(df_DS1.z, )
 
 # load chunk data
 chunk_file = helicalc_data+'Bmaps/aux/batch_N_helicalc_03-16-22.txt'
@@ -74,13 +79,18 @@ def DS1_calc(df=df_O, df_coil=df_DS1, df_interlayer=df_DS1_IL, outfile=save_name
         # integrate on grid and add to dataframe
         df_ = myCoil.integrate_grid(df_, N_batch=N_chunk_coil, tqdm=tqdm)
     # interlayer connect
+    # TEST!!
+    # comment out
     # create interlayer
     myArc = ArcIntegrator3D(df_interlayer, dxyz=dxyz_interlayer, dev=3,)# lib=np, int_func=np.trapz)
     # integrate on grid and add to dataframe
     df_ = myArc.integrate_grid(df_, N_batch=N_chunk_inter, tqdm=tqdm)
+    #####
     # add coil components
     for i in ['x', 'y', 'z']:
         df_.eval(f'B{i}_helicalc = B{i}_helicalc_c56_l1 + B{i}_helicalc_c56_l2 + B{i}_bus_arc_cn_56_il', inplace=True)
+        # TEST!!
+        # df_.eval(f'B{i}_helicalc = B{i}_helicalc_c56_l1 + B{i}_helicalc_c56_l2', inplace=True)
         # Tesla to Gauss
         df_.eval(f'B{i} = B{i} * 1e4', inplace=True)
         df_.eval(f'B{i}_helicalc = B{i}_helicalc * 1e4', inplace=True)
@@ -143,6 +153,8 @@ def run_deltaR(df=df_O, df_coil=df_DS1, deltaR=deltaR, outfile=save_name):
     #print(df_c)
     #print(df_il_eul)
     df_result = DS1_calc(df, df_c, df_il_eul, outfile)
+    # TEST! don't change IL
+    # df_result = DS1_calc(df, df_c, df_DS1_IL, outfile)
     return df_result
 
 if __name__ == '__main__':
