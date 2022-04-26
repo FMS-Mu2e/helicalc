@@ -144,9 +144,12 @@ def find_euler2_interlayer(df_il, weights=weights_default):
 
 
 if __name__=='__main__':
+    # which version?
+    # version = 13
+    version = 14
     # load coils
     paramdir = helicalc_dir + 'dev/params/'
-    paramname = 'Mu2e_V13'
+    paramname = f'Mu2e_V{version}'
     geom_df = read_solenoid_geom_combined(paramdir,paramname).iloc[55:].copy()
     # prep for interlayer calculation
     geom_il = prep_df_il(geom_df)
