@@ -65,6 +65,11 @@ class CoilIntegrator(object):
         if self.helicity < 0:
             # sort of ad hoc... FIXME!
             self.z_start = self.z_ref - geom_coil.L - 2*geom_coil.t_ci + 5e-5
+            # testing if this is better with V14, where more sig figs sent to OPERA
+            # negligible change, going back to original for now. Should settle this
+            # based on what is the most correct way to do this. Practically makes
+            # no difference.
+            #self.z_start = self.z_ref - geom_coil.L - 2*geom_coil.t_ci
         else:
             self.z_start = self.z_ref
         # setup integration steps
