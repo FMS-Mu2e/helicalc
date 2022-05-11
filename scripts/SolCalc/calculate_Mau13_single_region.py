@@ -13,7 +13,8 @@ from helicalc.constants import (
     TSd_grid,
     DS_grid,
     PStoDumpArea_grid,
-    ProtonDumpArea_grid
+    ProtonDumpArea_grid,
+    DS_cyl2d_grid_5mm
 )
 
 # paramdir = '/home/ckampa/coding/helicalc/dev/params/'
@@ -23,7 +24,8 @@ datadir = helicalc_data+'Bmaps/SolCalc_partial/'
 
 regions = {'PS': PS_grid, 'TSu': TSu_grid, 'TSd': TSd_grid, 'DS': DS_grid,
            'PStoDumpArea': PStoDumpArea_grid,
-           'ProtonDumpArea': ProtonDumpArea_grid}
+           'ProtonDumpArea': ProtonDumpArea_grid,
+           'DSCyl2D': DS_cyl2d_grid_5mm}
 
 if __name__=='__main__':
     # parse command line arguments
@@ -31,7 +33,7 @@ if __name__=='__main__':
     parser.add_argument('-r', '--Region',
                         help='Which region of Mu2e to calculate? '+
                         '["PS"(default), "TSu", "TSd", "DS", "PStoDumpArea"'+
-                        ', "ProtonDumpArea"]')
+                        ', "ProtonDumpArea", "DSCyl2D"]')
     parser.add_argument('-t', '--Testing',
                         help='Calculate using small subset of coils?'+
                         '"y"(default)/"n"')
