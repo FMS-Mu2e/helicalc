@@ -31,7 +31,7 @@ def config_plots():
         plt.rcParams['grid.linestyle'] = '--'    # dashed grid
         plt.rcParams.update({'font.size': 12.0})   # increase plot font size
 
-# create grid (cartesian
+# create grid (cartesian)
 def generate_cartesian_grid_df(grid_dict, dec_round=3):
     g = grid_dict
     edges = [np.round(np.linspace(g[f'{i}0'], g[f'{i}0']+(g[f'n{i}']-1)*g[f'd{i}'], g[f'n{i}']), decimals=dec_round)
@@ -43,3 +43,15 @@ def generate_cartesian_grid_df(grid_dict, dec_round=3):
     df = pd.DataFrame({'X':X, 'Y':Y, 'Z':Z})
 
     return df
+
+# # create grid (2D, with cylindrical symmetry
+# def generate_cyl2d_grid_df(grid_dict, dec_round=3):
+#     g = grid_dict
+#     edges = [np.round(np.linspace(g[f'{i}0'], g[f'{i}0']+(g[f'n{i}']-1)*g[f'd{i}'], g[f'n{i}']), decimals=dec_round)
+#              for i in ['R', 'Z']]
+#     R, Z = np.meshgrid(*edges, indexing='ij')
+#     R = R.flatten()
+#     Z = Z.flatten()
+#     df = pd.DataFrame({'R':R, 'Z':Z})
+
+#     return df

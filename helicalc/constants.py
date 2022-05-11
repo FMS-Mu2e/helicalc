@@ -39,6 +39,11 @@ ProtonDumpArea_grid = {'X0':-0.796, 'Y0':-5.600, 'Z0':-20.929,
                        'nX':20, 'nY':57, 'nZ':31,
                        'dX':0.200, 'dY':0.200, 'dZ':0.200}
 
+# 2D cylindrical grid
+DS_cyl2d_grid_5mm = {'X0':-3.904, 'Y0':0., 'Z0':4.101,
+                     'nX':161, 'nY':1, 'nZ':1881,
+                     'dX':0.005, 'dY':0.005, 'dZ':0.005}
+
 # integrator specific constants
 ## HELICALC / COILS
 # dxyz for helicalc (nominal values for Mu2e DS coils)
